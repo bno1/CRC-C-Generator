@@ -1,0 +1,4 @@
+[OPTIONS]
+max-returns=15
+max-branches=30
+max-statements=100
