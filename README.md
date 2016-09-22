@@ -19,15 +19,12 @@ The greatest power determines the size in bits of the CRC code.
 
 
 OPTIONS:
+````
 --tb=n - number of bits used by the lookup table.
-
-Valid values:
-
-2 - 4 entries, 4 lookups per byte
-
-4 - 16 entries, 2 lookups per byte
-
-8 - 256 entries, 1 lookup per byte (default)
+    Valid values:
+    2 - 4 entries, 4 lookups per byte
+    4 - 16 entries, 2 lookups per byte
+    8 - 256 entries, 1 lookup per byte (default)
 
 --ri - input is reflected, bits will be processes starting with LSB rather than MSB, default off
 
@@ -36,11 +33,10 @@ Valid values:
 --xoro=n - value to xor with before returning, default 0
 
 --iv=n - initial value of the crc, default 0
-
-n can be in base 10 (ex. 65535), base 16 (ex. 0xffff) or base 2 (ex. 0b1111111111111111)
+    n can be in base 10 (ex. 65535), base 16 (ex. 0xffff) or base 2 (ex. 0b1111111111111111)
 
 --fn=name - name of the function that will be generated, "crc" by default
-
+```
 Example that generates code for CRC-CCITT (Kermit) with a byte-indexed table:
 
 `./crc_c_generator.py --fn=kermit --ri --ro 16 12 5 0 kermit.h kermit.c`
