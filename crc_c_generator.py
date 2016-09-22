@@ -27,7 +27,8 @@ import sys
 FLAG_REFIN = 1 # reflected input
 FLAG_REFOUT = 2 # reflected output
 USAGE = '''Usage: %(cmd)s [OPTIONS] POWERS [HEADER_FILE] SOURCE_FILE
-Where <POWERS> represents the space separated list of powers in the CRC polynomial, in any order. The greatest power determines the size in bits of the CRC code.
+Where POWERS represents the space separated list of powers in the CRC polynomial, in any order.
+The greatest power determines the size in bits of the CRC code.
 
 OPTIONS:
 --tb=n - number of bits used by the lookup table.
@@ -48,7 +49,7 @@ OPTIONS:
 --fn=name - name of the function that will be generated, "crc" by default
 
 Example that generates code for CRC-CCITT (Kermit) with a byte-indexed table:
-%(cmd)s --ri --ro 16 12 5 0 kermit.h kermit.c
+%(cmd)s --fn=kermit --ri --ro 16 12 5 0 kermit.h kermit.c
 '''
 
 def parse_cmdline(argv):
@@ -331,7 +332,7 @@ def generate_source(**kwargs):
     for power in powers[1:]:
         params['generator'] |= 1 << power
 
-    params['table_contents'] = ',\n\t\t'.join(
+    params['table_contents'] = ',\n        '.join(
         [', '.join(line) for line in  zip(*[iter(lookuptable_str)]*4)]
     )
 
@@ -340,12 +341,12 @@ def generate_source(**kwargs):
             params['computation'] = 'r = (r >> 8) ^ lt[((uint8_t)r ^ *buffer) & 0xff];'
         elif table_bits == 4:
             params['computation'] = 'r = (r >> 4) ^ lt[((uint8_t)r ^ *buffer) & 0xf];' + \
-                '\n\t\tr = (r >> 4) ^ lt[((uint8_t)r ^ (*buffer >> 4)) & 0xf];'
+                '\n        r = (r >> 4) ^ lt[((uint8_t)r ^ (*buffer >> 4)) & 0xf];'
         elif table_bits == 2:
             params['computation'] = 'r = (r >> 2) ^ lt[((uint8_t)r ^ *buffer) & 0x3];' + \
-                '\n\t\tr = (r >> 2) ^ lt[((uint8_t)r ^ (*buffer >> 2)) & 0x3];' + \
-                '\n\t\tr = (r >> 2) ^ lt[((uint8_t)r ^ (*buffer >> 4)) & 0x3];' + \
-                '\n\t\tr = (r >> 2) ^ lt[((uint8_t)r ^ (*buffer >> 6)) & 0x3];'
+                '\n        r = (r >> 2) ^ lt[((uint8_t)r ^ (*buffer >> 2)) & 0x3];' + \
+                '\n        r = (r >> 2) ^ lt[((uint8_t)r ^ (*buffer >> 4)) & 0x3];' + \
+                '\n        r = (r >> 2) ^ lt[((uint8_t)r ^ (*buffer >> 6)) & 0x3];'
     else:
         if table_bits == 8:
             params['computation'] = \
@@ -353,29 +354,29 @@ def generate_source(**kwargs):
         elif table_bits == 4:
             params['computation'] = \
                 'r = (r << 4) ^ lt[((uint8_t)(r >> %(rs)d) ^ (*buffer >> 4)) & 0xf];' + \
-                '\n\t\tr = (r << 4) ^ lt[((uint8_t)(r >> %(rs)d) ^ *buffer) & 0xf];'
+                '\n        r = (r << 4) ^ lt[((uint8_t)(r >> %(rs)d) ^ *buffer) & 0xf];'
         elif table_bits == 2:
             params['computation'] = \
                 'r = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ (*buffer >> 6)) & 0x3];' + \
-                '\n\t\tr = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ (*buffer >> 4)) & 0x3];' + \
-                '\n\t\tr = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ (*buffer >> 2)) & 0x3];' + \
-                '\n\t\tr = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ *buffer) & 0x3];'
+                '\n        r = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ (*buffer >> 4)) & 0x3];' + \
+                '\n        r = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ (*buffer >> 2)) & 0x3];' + \
+                '\n        r = (r << 2) ^ lt[((uint8_t)(r >> %(rs)d) ^ *buffer) & 0x3];'
 
         params['computation'] = params['computation'] % {'rs' : powers[0] - table_bits}
 
     if flags & FLAG_REFOUT:
         if powers[0] > 32:
-            params['reflect_out'] = '\n\tr = (r >> 32) | ((r & 0xffffffff) << 32);\n' + \
-                '\tr = ((r & 0xffff0000ffff0000) >> 16) | ((r & 0x0000ffff0000ffff) << 16);\n' + \
-                '\tr = ((r & 0xff00ff00ff00ff00) >>  8) | ((r & 0x00ff00ff00ff00ff) <<  8);\n'
+            params['reflect_out'] = '\n    r = (r >> 32) | ((r & 0xffffffff) << 32);\n' + \
+                '    r = ((r & 0xffff0000ffff0000) >> 16) | ((r & 0x0000ffff0000ffff) << 16);\n' + \
+                '    r = ((r & 0xff00ff00ff00ff00) >>  8) | ((r & 0x00ff00ff00ff00ff) <<  8);\n'
         elif powers[0] > 16:
-            params['reflect_out'] = '\n\tr = (r >> 16) | ((r & 0xffff) << 16);\n' + \
-                '\tr = ((r & 0xff00ff00) >>  8) | ((r & 0x00ff00ff) <<  8);\n'
+            params['reflect_out'] = '\n    r = (r >> 16) | ((r & 0xffff) << 16);\n' + \
+                '    r = ((r & 0xff00ff00) >>  8) | ((r & 0x00ff00ff) <<  8);\n'
         elif powers[0] > 8:
-            params['reflect_out'] = '\n\tr = (r >> 8) | ((r & 0xff) << 8);\n'
+            params['reflect_out'] = '\n    r = (r >> 8) | ((r & 0xff) << 8);\n'
 
     if xoro != 0:
-        params['xoro_code'] = '\n\tr ^= 0x%x;\n' % xoro
+        params['xoro_code'] = '\n    r ^= 0x%x;\n' % xoro
 
     if 'header_file' in kwargs:
         include = '#include "%s"\n\n' % kwargs['header_file']
