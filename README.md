@@ -10,6 +10,9 @@ The CRC function can be customized by controlling:
 The C code uses a pregenerated lookup table of size 4, 16 or 256 (2 bits, 4 bits
 or 8 bits for index).
 
+# Requirements
+Python 2.6 or greater (compatible with python3).
+
 # Usage
 `./crc_c_generator.py [OPTIONS] POWERS [HEADER_FILE] SOURCE_FILE`
 
