@@ -1,11 +1,11 @@
 # CRC C Code Generator
-Generates C function that computes a CRC function.
+Generates a C function that computes a CRC function.
 The CRC function can be customized by controlling:
  - The generator polynomial
  - Initial CRC value
  - Xor value before returning CRC
  - Input reflection (bit order)
- - Output reflecrtion (byte order)
+ - Output reflection (byte order)
 
 The C code uses a pregenerated lookup table of size 4, 16 or 256 (2 bits, 4 bits
 or 8 bits for index).
