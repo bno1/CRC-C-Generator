@@ -46,7 +46,7 @@ Example that generates code for CRC-CCITT (Kermit) with a byte-indexed table:
 `./crc_c_generator.py --fn=kermit --ri --ro 16 12 5 0 kermit.h kermit.c`
 
 kermit.h
-```
+```C
 #pragma once
 
 #include <stdint.h>
