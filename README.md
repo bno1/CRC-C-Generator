@@ -22,7 +22,7 @@ The greatest power determines the size in bits of the CRC code.
 
 
 OPTIONS:
-````
+```
 --tb=n - number of bits used by the lookup table.
     Valid values:
     2 - 4 entries, 4 lookups per byte
@@ -40,12 +40,13 @@ OPTIONS:
 
 --fn=name - name of the function that will be generated, "crc" by default
 ```
+
 Example that generates code for CRC-CCITT (Kermit) with a byte-indexed table:
 
 `./crc_c_generator.py --fn=kermit --ri --ro 16 12 5 0 kermit.h kermit.c`
 
 kermit.h
-```C
+```
 #pragma once
 
 #include <stdint.h>
